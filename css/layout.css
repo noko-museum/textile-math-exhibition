@@ -63,6 +63,7 @@ body {
 }
 
 .app-header {
+  position: relative; /* .mode-badge を右上に絶対配置するための基準 */
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -192,4 +193,26 @@ body {
 .primary-btn:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+/* =========================================================
+   レスポンシブデザイン (ノートPC・デスクトップ向け最適化)
+   ※ レイアウトの縦積み構造(見出し→入力/評価パネル→キャンバス→
+   　 レーダーチャート)自体は変更しない。横幅1100px以上では、
+   　 「さいしゅうデザイン」(キャンバス)と「くわしい とくちょう」
+   　 (レーダーチャート)を実寸16cm四方で表示する。
+   　 行列パネル(.matrix-grid)と評価カード(.fabric-card)は、
+   　 このレスポンシブ対応を入れる前の初期状態のサイズのまま
+   　 (このブロックでは一切上書きしない)。
+========================================================= */
+@media (min-width: 1100px) {
+  /* CSSのcm単位は1cm=96px/2.54で解決される(印刷スタイルのmm指定と同じ考え方) */
+  .canvas-wrapper {
+    max-width: 16cm;
+  }
+
+  .radar-chart-container {
+    max-width: 16cm;
+    margin-inline: auto;
+  }
 }

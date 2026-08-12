@@ -13,12 +13,7 @@ import { RadarEvaluator } from './core/RadarEvaluator.js';
 import { RadarChartUI } from './components/RadarChartUI.js';
 import { ApiService } from './services/ApiService.js';
 import { PrintManager } from './components/PrintManager.js';
-
-// URLクエリ「?festival」の有無で「サマーフェスタモード」を判定する。
-// 印刷関連の分岐は、この isFestival だけを見て判定する設計に統一する。
-// 通常モード: 印刷不可(ボタン非表示)。サマーフェスタモード: 印刷可能。
-const params = new URLSearchParams(window.location.search);
-const isFestival = params.has('festival');
+import { isFestivalMode } from './utils/mode.js';
 
 // アプリケーションの状態
 const AppState = {
@@ -59,31 +54,58 @@ function initApp(){
     resetBtn.addEventListener('click', () => matrixInputUI.reset());
   }
 
+  setupSaveFeature();
+  setupPrintFeature();
+  setupModeBadge();
+}
+
+/**
+ * 保存機能のセットアップ。
+ * 通常モード(来館者向け)では保存ボタンをdisplay:noneで完全に非表示にし、
+ * クリックイベントも登録しない(disabledではなく、存在しないように見せる)。
+ * 展示モード(?mode=festival)でのみ、従来通りボタンを表示・クリック可能にする。
+ * モード限定機能の判定は isFestivalMode だけを見て行う設計に統一する。
+ */
+function setupSaveFeature(){
   const saveBtn = document.getElementById('btn-save');
-  if(saveBtn){
-    saveBtn.addEventListener('click', () => handleSave(saveBtn));
+  if(!saveBtn) return;
+
+  if(!isFestivalMode){
+    saveBtn.style.display = 'none';
+    return;
   }
 
-  setupPrintFeature();
+  saveBtn.addEventListener('click', () => handleSave(saveBtn));
 }
 
 /**
  * 印刷機能のセットアップ。
  * 通常モードでは印刷ボタンをdisplay:noneで完全に非表示にし、クリックイベントも登録しない
  * (disabledではなく、存在しないように見せる)。
- * サマーフェスタモード(?festival)でのみ、従来通りボタンを表示・クリック可能にする。
- * 今後、印刷以外にもモード限定機能を追加する場合は isFestival を見て分岐すること。
+ * 展示モード(?mode=festival)でのみ、従来通りボタンを表示・クリック可能にする。
+ * 今後、保存・印刷以外にもモード限定機能を追加する場合は isFestivalMode を見て分岐すること。
  */
 function setupPrintFeature(){
   const printBtn = document.getElementById('btn-print');
   if(!printBtn) return;
 
-  if(!isFestival){
+  if(!isFestivalMode){
     printBtn.style.display = 'none';
     return;
   }
 
   printBtn.addEventListener('click', () => handlePrint());
+}
+
+/**
+ * 画面右上のモード表示バッジ(「体験版」/「展示モード」)のセットアップ。
+ */
+function setupModeBadge(){
+  const badge = document.getElementById('mode-badge');
+  if(!badge) return;
+
+  badge.textContent = isFestivalMode ? '展示モード' : '体験版';
+  badge.classList.toggle('mode-badge--festival', isFestivalMode);
 }
 
 /**
@@ -147,6 +169,7 @@ function applyBeautyCard(beauty){
  * 「保存・印刷」ボタン押下時の処理
  */
 async function handleSave(saveBtn){
+  if(!isFestivalMode) return;
   if(AppState.isProcessing) return;
   if(!AppState.design || !AppState.evalResult || !AppState.inputState){
     console.error('保存できません: デザインがまだ生成されていません');
@@ -182,13 +205,9 @@ async function handleSave(saveBtn){
       canvasDataUrl: image64,
       radarChartHtml: document.getElementById('radar-chart')?.innerHTML || ''
     };
-    if (isFestival) {
-      const printBtn = document.getElementById('btn-print');
-      if (printBtn) printBtn.disabled = false;
-      alert('作品を保存しました。印刷ボタンからカードを印刷できます。');
-    } else {
-      alert('作品を保存しました。');
-    }
+    const printBtn = document.getElementById('btn-print');
+    if (printBtn) printBtn.disabled = false;
+    alert('作品を保存しました。印刷ボタンからカードを印刷できます。');
 
   } catch(error){
     alert('保存に失敗しました。ネットワーク状況を確認してください。\n' + error.message);
@@ -200,7 +219,7 @@ async function handleSave(saveBtn){
 }
 
 function handlePrint(){
-  if (!isFestival) return;
+  if (!isFestivalMode) return;
   if (!AppState.savedWork || !AppState.design || !AppState.evalResult || !AppState.inputState) {
     alert('先に作品を保存してください。');
     return;
@@ -218,4 +237,4 @@ function handlePrint(){
 }
 
 // テスト用に主要な関数・状態を公開（本番の動作には影響しない）
-export { AppState, initApp, handleInputChange, handleSave, handlePrint, updateFabricCards, isFestival };
+export { AppState, initApp, handleInputChange, handleSave, handlePrint, updateFabricCards, isFestivalMode };

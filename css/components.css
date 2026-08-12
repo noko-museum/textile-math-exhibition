@@ -4,6 +4,33 @@
  */
 
 /* =========================================================
+   モード表示バッジ (体験版 / 展示モード)
+   ※ app.js の setupModeBadge() がテキストと
+   　 .mode-badge--festival の付与を制御する。
+========================================================= */
+.mode-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-block;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  color: var(--text-sub, #aaa);
+  background: var(--bg-panel-hover, #2a2a2a);
+  border: 1px solid var(--border-color, #333);
+  white-space: nowrap;
+}
+
+.mode-badge--festival {
+  color: #fff;
+  background: var(--accent-secondary, #00b4d8);
+  border-color: var(--accent-secondary, #00b4d8);
+}
+
+/* =========================================================
    ボタン (Buttons)
 ========================================================= */
 .primary-btn {
