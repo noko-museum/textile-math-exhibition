@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weaving Matrix - 行列織物シミュレーター</title>
+
+  <!-- CSSの読み込み -->
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- ヘッダー部分 -->
+    <header class="app-header">
+      <h1>Weaving Matrix</h1>
+      <p>0と1をタップして、あなただけの織物を作りましょう</p>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+
+      <!-- 左側：入力パネル -->
+      <section class="left-panel">
+
+        <h2>もようの おおきさ</h2>
+        <!-- サイズ選択ボタン（2x2, 3x3, 4x4, 5x5）: MatrixInputUI.js が動的生成 -->
+        <div id="size-tabs" class="size-tabs"></div>
+
+        <h2>もとの はんこ（B）</h2>
+        <p class="hint-text">マスをタップすると 0 と 1 が切り替わります</p>
+        <!-- Bのマス目: MatrixInputUI.js が動的生成 -->
+        <div id="matrix-grid" class="matrix-grid"></div>
+
+        <!-- ランダム生成・リセットボタン -->
+        <div class="button-row">
+          <button id="btn-random" class="btn-secondary">ランダム生成</button>
+          <button id="btn-reset" class="btn-secondary">リセット</button>
+        </div>
+
+        <h2>いとの リズム</h2>
+        <p class="hint-text">経糸・緯糸がどう通るかを選ぼう</p>
+        <!-- パターン選択（ストレート/鏡映/山型）: MatrixInputUI.js が動的生成 -->
+        <div id="pattern-tabs" class="pattern-tabs"></div>
+
+      </section>
+
+      <!-- 右側：織物評価 -->
+      <section class="right-panel">
+        <div class="evaluation-section">
+          <h2>この布のようす</h2>
+          <p class="hint-text">数字ではなく、布の「さわりごこち」で伝えます</p>
+
+          <!-- じょうぶさ -->
+          <div id="strengthCard" class="fabric-card">
+            <div class="label">じょうぶさ</div>
+            <div class="state"><span class="icon">🧵</span><span id="strengthText">かんせいを まってね</span></div>
+            <div class="sub" id="strengthSub"></div>
+          </div>
+
+          <!-- あつさ・すけかた -->
+          <div id="densityCard" class="fabric-card">
+            <div class="label">あつさ・すけかた</div>
+            <div class="state"><span class="icon">🌬️</span><span id="densityText">かんせいを まってね</span></div>
+            <div class="sub" id="densitySub"></div>
+          </div>
+
+          <!-- もようの うつくしさ -->
+          <div id="beautyCard" class="fabric-card">
+            <div class="label">もようの うつくしさ</div>
+            <div class="state"><span class="icon">✨</span><span id="beautyText">かんせいを まってね</span></div>
+            <div class="sub sparkle" id="beautySparkle">くりかえしの もようを みつけたよ！</div>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="visualization-section" aria-labelledby="design-heading">
+        <h2 id="design-heading">さいしゅうデザイン</h2>
+        <div class="canvas-wrapper">
+          <canvas id="weaveCanvas"></canvas>
+        </div>
+      </section>
+
+      <section class="radar-chart-section" aria-labelledby="radar-heading">
+        <h2 id="radar-heading">くわしい とくちょう</h2>
+        <p class="hint-text">5つの指標で、もっとくわしく見てみよう</p>
+        <div id="radar-chart" class="radar-chart-container"></div>
+        <div class="action-buttons">
+          <button id="btn-save" class="primary-btn">作品を保存</button>
+          <button id="btn-print" class="primary-btn secondary-action" disabled>印刷</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- 通知用ポップアップ（非表示） -->
+  <div id="notification" class="notification hidden">
+    <span id="notificationMessage">処理中...</span>
+  </div>
+
+  <!-- 印刷用の一時レイアウト領域（画面には表示されない。PrintManager.jsが動的に生成） -->
+  <div id="printArea" class="hidden-print"></div>
+
+  <!-- JavaScriptの読み込み -->
+  <!-- 外部ライブラリ（QRコード生成用・印刷カードで使用） -->
+  <script src="js/utils/qrcode.min.js"></script>
+  <!-- メインスクリプト（モジュールとして読み込み） -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

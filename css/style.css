@@ -1,0 +1,239 @@
+@charset "UTF-8";
+
+/*
+ * style.css
+ * ※以前は3カラムレイアウト時代の設計（.main-grid, .panel, #weave-canvas など）が
+ *   混在していましたが、実際のHTML構造（2カラム: .left-panel / .right-panel）と
+ *   一致しないため、それらはすべて削除しました。
+ * ※印刷用スタイル（@media print）は、行列式・スコア方式時代の
+ *   .print-score / .print-stars を廃止し、PrintManager.js（新データ形式対応版）が
+ *   生成する .print-eval-* / .print-seed* に合わせて更新しました。
+ */
+
+/* =========================================
+   ベース調整
+   ========================================= */
+body {
+  /* 展示端末向けの「スクロール禁止」指定は撤去しました
+     （3大問題の1つ「スクロールできない」の直接原因だったため） */
+  user-select: none; /* テキスト選択禁止（UI操作性向上のため維持） */
+}
+
+/* =========================================
+   Print Styles (印刷専用レイアウト)
+   ※ PrintManager.js が生成する #print-container 以下の
+   　 print-card / print-left / print-right などのクラス名と対応
+   ========================================= */
+@media print {
+  /* 画面用のUIをすべて非表示 */
+  body > *:not(.print-only) {
+    display: none !important;
+  }
+
+  /* 印刷用の設定 (A5横サイズ) */
+  @page {
+    size: A5 landscape;
+    margin: 0;
+  }
+
+  body {
+    background: #fff; /* 印刷時は白背景 */
+    color: #000;
+  }
+
+  .print-only {
+    display: block;
+    width: 210mm;
+    height: 148mm;
+    overflow: hidden;
+  }
+
+  .print-card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    width: 100%;
+    height: 100%;
+    padding: 7mm;
+    box-sizing: border-box;
+    gap: 5mm;
+  }
+
+  /* -----------------------------------------
+     左側: 完成デザイン画像 + たね(B行列)ミニビジュアル
+     ※ 画像1枚だけを前提にした縦横100%指定から、
+       「画像(可変) + B行列(固定高さの footer)」の縦積みに変更
+  ----------------------------------------- */
+  .print-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 4mm;
+    overflow: hidden;
+    background: #f0f0f0;
+  }
+
+  .print-image {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .print-seed {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 2mm 0;
+    text-align: center;
+    background: #f0f0f0;
+    box-sizing: border-box;
+  }
+
+  .print-seed-label {
+    font-size: 6pt;
+    color: #666;
+    margin-bottom: 1mm;
+  }
+
+  .print-seed-grid {
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  /* -----------------------------------------
+     右側: タイトル・メタ情報・評価カード・QR
+  ----------------------------------------- */
+  .print-right {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 2mm;
+    min-width: 0;
+  }
+
+  .print-title {
+    font-size: 14pt;
+    font-weight: bold;
+    border-bottom: 1px solid #000;
+    padding-bottom: 2mm;
+    margin-bottom: 2mm;
+  }
+
+  .print-meta p {
+    font-size: 9pt;
+    margin-bottom: 1mm;
+    line-height: 1.3;
+  }
+
+  /* 評価3カード（じょうぶさ・あつさ/すけかた・うつくしさ）
+     ※ メイン画面の .fabric-card を印刷でも再利用しているため、
+       ここで白背景の印刷レイアウト向けに上書きしている */
+  .print-eval {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5mm;
+  }
+
+  .print-eval-card.fabric-card {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 2mm;
+    padding: 1.5mm 2mm;
+    margin-bottom: 0; /* 画面用の margin-bottom を印刷では無効化し、gapで間隔を取る */
+  }
+
+  .print-eval-card.fabric-card.good {
+    border-color: #4caf7d;
+    background: #eef8f2;
+  }
+
+  .print-eval-card.fabric-card.warn {
+    border-color: #ff7e67;
+    background: #fff1ee;
+  }
+
+  .print-eval-label {
+    font-size: 6pt;
+    color: #888;
+    margin-bottom: 0.5mm;
+  }
+
+  .print-eval-text {
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: #000;
+  }
+
+  .print-eval-sub {
+    font-size: 6.5pt;
+    color: #555;
+    margin-top: 0.5mm;
+    line-height: 1.3;
+  }
+
+  .print-eval-sparkle {
+    margin-left: 1mm;
+  }
+
+  .print-qr {
+    display: grid;
+    grid-template-columns: 25mm 1fr;
+    column-gap: 2mm;
+    align-items: center;
+    justify-self: end;
+  }
+
+  #qr-code-box {
+    width: 25mm;
+    height: 25mm;
+  }
+
+  #qr-code-box img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .qr-hint {
+    font-size: 7pt;
+    color: #666;
+  }
+
+  .print-id {
+    font-size: 7pt;
+    color: #999;
+  }
+
+  .print-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 58mm;
+    gap: 3mm;
+    min-height: 0;
+    align-items: center;
+  }
+
+  .print-radar {
+    border: 1px solid #ddd;
+    border-radius: 2mm;
+    padding: 1mm;
+  }
+
+  .print-radar-title {
+    font-size: 7pt;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .print-radar .radar-chart-svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .print-radar .radar-axis-label {
+    fill: #333;
+    font-size: 8px;
+  }
+
+  .print-radar .radar-grid-ring,
+  .print-radar .radar-axis-line {
+    stroke: #999;
+  }
+}

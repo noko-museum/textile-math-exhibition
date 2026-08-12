@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理ダッシュボード - Weaving Matrix</title>
+  
+  <!-- CSSの読み込み (展示画面と共通のコンポーネントも利用) -->
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <style>
+    /* 管理画面特有の簡易スタイル（必要に応じてcssに分離） */
+    .admin-container {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      color: var(--text-main);
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--bg-panel);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .stat-card h3 { font-size: 1rem; color: var(--text-sub); }
+    .stat-card p { font-size: 2rem; font-weight: bold; color: var(--accent-primary); margin-top: 0.5rem; }
+    
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-panel);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .admin-table th, .admin-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .admin-table th {
+      background: var(--bg-panel-hover);
+      color: var(--text-sub);
+    }
+    .admin-table tr:hover { background: rgba(255,255,255,0.05); }
+    .thumbnail {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body class="admin-body">
+  <div class="admin-container">
+    
+    <!-- ヘッダー -->
+    <header class="admin-header">
+      <h1>管理ダッシュボード - Weaving Matrix</h1>
+      <div class="nav-buttons">
+        <button id="refreshBtn" class="btn-secondary">最新データを取得</button>
+        <a href="index.html" class="btn-secondary" style="text-decoration: none; text-align: center;">展示画面へ戻る</a>
+      </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main>
+      <!-- 統計情報 -->
+      <section class="admin-stats">
+        <div class="stat-card">
+          <h3>総作品数</h3>
+          <p id="totalWorksCount">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>本日の生成数</h3>
+          <p id="todayWorksCount">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>平均スコア</h3>
+          <p id="averageScore">0</p>
+        </div>
+      </section>
+
+      <!-- ギャラリー / データテーブル -->
+      <section class="admin-gallery">
+        <h2>作品一覧（GAS同期）</h2>
+        <div style="overflow-x: auto; margin-top: 1rem;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>画像</th>
+                <th>日時</th>
+                <th>ID</th>
+                <th>行列 (3x3)</th>
+                <th>スコア</th>
+                <th>模様 / カラー</th>
+              </tr>
+            </thead>
+            <tbody id="worksTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-sub);">
+                  「最新データを取得」ボタンを押してGASからデータをロードしてください。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- 管理画面用スクリプトの読み込み -->
+  <script type="module">
+    import { AdminUI } from './js/components/AdminUI.js';
+    document.addEventListener('DOMContentLoaded', () => {
+      // AdminUIの初期化 (後ほど⑤で実装します)
+      const adminUI = new AdminUI();
+    });
+  </script>
+</body>
+</html>

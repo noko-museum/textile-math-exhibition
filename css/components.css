@@ -1,0 +1,338 @@
+/*
+ * components.css
+ * ボタン、入力マス、パネルなど、独立したUI部品のスタイルを定義
+ */
+
+/* =========================================================
+   ボタン (Buttons)
+========================================================= */
+.primary-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--accent-primary, #ff7e67);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
+}
+
+.primary-btn:hover {
+  background-color: #ff664b;
+}
+
+.primary-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background-color: var(--bg-panel-hover, #333);
+  color: var(--text-main, #fff);
+  border: 1px solid var(--border-color, #444);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #444;
+  border-color: #666;
+}
+
+/* =========================================================
+   マトリックス入力マス (Matrix Grid)
+   ※ MatrixInputUI.js が <button class="matrix-cell"> を動的生成
+   　 タップで 0 ⇔ 1 を切り替えるトグルボタンとして使用
+========================================================= */
+.matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 2rem;
+  background: var(--bg-panel, #222);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #333);
+}
+
+.matrix-cell {
+  /* <button> のブラウザデフォルトスタイルをリセット */
+  appearance: none;
+  outline: none;
+  font-family: 'Courier New', monospace;
+
+  background-color: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 8px;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--text-main, #fff);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none; /* タップ連打時のテキスト選択を防止 */
+}
+
+.matrix-cell:hover {
+  border-color: #555;
+  background-color: #2a2a2a;
+}
+
+.matrix-cell:active {
+  transform: scale(0.95);
+}
+
+/* 値が1のマス（選択中扱い） */
+.matrix-cell.active {
+  border-color: var(--accent-primary, #ff7e67);
+  box-shadow: 0 0 15px rgba(255, 126, 103, 0.3);
+  background-color: #2a2a2a;
+  color: var(--accent-primary, #ff7e67);
+}
+
+/* =========================================================
+   評価カード (Fabric Cards)
+   ※ EngineeringEvaluator.js が生成する評価結果を、app.js の
+   　 applyCardInfo() / applyBeautyCard() が反映する先。
+   　 #strengthCard / #densityCard(#thicknessカード) / #beautyCard
+   　 のclassNameとして 'fabric-card' [+ ' good' | ' warn'] が
+   　 動的に設定される（stateが'neutral'のときは無印のまま）。
+   　 PrintManager.js の印刷レイアウトでも同じクラスを再利用している
+   　 （@media print側で色を上書きするため、style.css も参照）。
+========================================================= */
+.fabric-card {
+  background: var(--bg-panel, #222);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.fabric-card:last-child {
+  margin-bottom: 0;
+}
+
+/* 良好な状態（じょうぶ・くりかえし模様あり、など） */
+.fabric-card.good {
+  border-color: #4caf7d;
+  background-color: rgba(76, 175, 125, 0.08);
+}
+
+/* 注意を促したい状態（浮きがある・透けやすい、など） */
+.fabric-card.warn {
+  border-color: var(--accent-primary, #ff7e67);
+  background-color: rgba(255, 126, 103, 0.08);
+}
+
+/* うつくしさカードの「くりかえしを検出した」ときのキラキラ演出
+   ※ 実際の対象要素(id="beautySparkle")がindex.html側でどのタグ・
+     初期classを持つか未確認のため、id直下への状態クラス付与という
+     最小限の前提のみで書いている。見た目が想定と違う場合はindex.html
+     を共有してほしい。 */
+#beautySparkle {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#beautySparkle.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* =========================================================
+   レーダーチャート (Radar Chart)
+   ※ RadarChartUI.js が <svg class="radar-chart-svg"> を動的生成し、
+   　 #radar-chart コンテナに差し込む。RadarEvaluator.js が算出する
+   　 5指標（交錯頻度・浮き・非交錯比・剛性係数・空隙率）の1〜5スコアを
+   　 レーダー状に可視化する（じょうぶさ等の文言カードとは別枠の、
+   　 より詳しい数値情報として提供する）。
+========================================================= */
+.radar-chart-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed var(--border-color, #333);
+}
+
+.radar-chart-container {
+  background: var(--bg-panel, #222);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+}
+
+.radar-chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.radar-grid-ring {
+  fill: none;
+  stroke: var(--border-color, #333);
+  stroke-width: 1;
+}
+
+.radar-grid-outer {
+  stroke: var(--text-sub, #aaa);
+  stroke-width: 1.5;
+}
+
+.radar-axis-line {
+  stroke: var(--border-color, #333);
+  stroke-width: 1;
+}
+
+.radar-data-shape {
+  fill-opacity: 0.35;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.radar-data-dot {
+  fill: var(--text-main, #fff);
+  stroke: var(--accent-primary, #ff7e67);
+  stroke-width: 1.5;
+}
+
+.radar-axis-label {
+  fill: var(--text-sub, #aaa);
+  font-size: 11px;
+}
+
+/* =========================================================
+   評価パネルの部品 (Evaluation Stats)
+   ※ 行列式時代のスコアバー表示。現行UIのfabric-cardとは別物だが、
+   　 他画面（admin.html等）で使う可能性を考慮し、当面は残している。
+========================================================= */
+.score-container {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.score-label {
+  font-size: 0.9rem;
+  color: var(--text-sub, #aaa);
+}
+
+.score-bar-bg {
+  width: 100%;
+  height: 12px;
+  background-color: #333;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.score-bar-fill {
+  height: 100%;
+  width: 0%; /* JSで制御 */
+  background-color: var(--accent-primary, #ff7e67);
+  border-radius: 6px;
+}
+
+.score-value {
+  text-align: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--accent-primary, #ff7e67);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.stat-box {
+  background: var(--bg-panel, #222);
+  padding: 1rem 0.5rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid var(--border-color, #333);
+}
+
+.stat-title {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-sub, #aaa);
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-main, #fff);
+}
+
+/* =========================================================
+   通知ポップアップ (Notification Toast)
+========================================================= */
+.notification {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  border: 1px solid var(--accent-primary, #ff7e67);
+  display: none; /* 初期状態はJS/animationsで制御 */
+}
+
+/* =========================================================
+   ギャラリーカード (Admin/Gallery)
+========================================================= */
+.gallery-card {
+  background: var(--bg-panel, #222);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gallery-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background-color: #fff;
+}
+
+.gallery-info {
+  padding: 1rem;
+}
+
+.gallery-info h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.gallery-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-sub, #aaa);
+  line-height: 1.4;
+}
