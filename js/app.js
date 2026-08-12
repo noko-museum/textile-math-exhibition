@@ -14,6 +14,12 @@ import { RadarChartUI } from './components/RadarChartUI.js';
 import { ApiService } from './services/ApiService.js';
 import { PrintManager } from './components/PrintManager.js';
 
+// URLクエリ「?festival」の有無で「サマーフェスタモード」を判定する。
+// 印刷関連の分岐は、この isFestival だけを見て判定する設計に統一する。
+// 通常モード: 印刷不可(ボタン非表示)。サマーフェスタモード: 印刷可能。
+const params = new URLSearchParams(window.location.search);
+const isFestival = params.has('festival');
+
 // アプリケーションの状態
 const AppState = {
   inputState: null,  // MatrixInputUIの状態 { B, n, pattern }
@@ -58,10 +64,26 @@ function initApp(){
     saveBtn.addEventListener('click', () => handleSave(saveBtn));
   }
 
+  setupPrintFeature();
+}
+
+/**
+ * 印刷機能のセットアップ。
+ * 通常モードでは印刷ボタンをdisplay:noneで完全に非表示にし、クリックイベントも登録しない
+ * (disabledではなく、存在しないように見せる)。
+ * サマーフェスタモード(?festival)でのみ、従来通りボタンを表示・クリック可能にする。
+ * 今後、印刷以外にもモード限定機能を追加する場合は isFestival を見て分岐すること。
+ */
+function setupPrintFeature(){
   const printBtn = document.getElementById('btn-print');
-  if(printBtn){
-    printBtn.addEventListener('click', () => handlePrint());
+  if(!printBtn) return;
+
+  if(!isFestival){
+    printBtn.style.display = 'none';
+    return;
   }
+
+  printBtn.addEventListener('click', () => handlePrint());
 }
 
 /**
@@ -160,9 +182,13 @@ async function handleSave(saveBtn){
       canvasDataUrl: image64,
       radarChartHtml: document.getElementById('radar-chart')?.innerHTML || ''
     };
-    const printBtn = document.getElementById('btn-print');
-    if (printBtn) printBtn.disabled = false;
-    alert('作品を保存しました。印刷ボタンからカードを印刷できます。');
+    if (isFestival) {
+      const printBtn = document.getElementById('btn-print');
+      if (printBtn) printBtn.disabled = false;
+      alert('作品を保存しました。印刷ボタンからカードを印刷できます。');
+    } else {
+      alert('作品を保存しました。');
+    }
 
   } catch(error){
     alert('保存に失敗しました。ネットワーク状況を確認してください。\n' + error.message);
@@ -174,6 +200,7 @@ async function handleSave(saveBtn){
 }
 
 function handlePrint(){
+  if (!isFestival) return;
   if (!AppState.savedWork || !AppState.design || !AppState.evalResult || !AppState.inputState) {
     alert('先に作品を保存してください。');
     return;
@@ -191,4 +218,4 @@ function handlePrint(){
 }
 
 // テスト用に主要な関数・状態を公開（本番の動作には影響しない）
-export { AppState, initApp, handleInputChange, handleSave, handlePrint, updateFabricCards };
+export { AppState, initApp, handleInputChange, handleSave, handlePrint, updateFabricCards, isFestival };

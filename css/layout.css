@@ -171,7 +171,9 @@ body {
 
 .action-buttons {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* auto-fit: 印刷ボタンがdisplay:noneで消えている場合(通常モード)は
+     自動的に1列(全幅)になり、レイアウトが崩れない */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
 }
 
